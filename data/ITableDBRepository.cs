@@ -7,5 +7,6 @@ namespace AzEmidsFunction.Data {
     public interface ITableDBRepository<T> where T : class, new() {
         Task<List<PatientItem>> GetAllPatientInformation(CloudTable table, String invocationName);
         Task<PatientItem> GetAPatientInformation(CloudTable table, String invocationName, string rowKey);
+        Task<PatientItem> CreateAPatientInformation(CloudTable table, String invocationName, Patient patient);
     }
 }

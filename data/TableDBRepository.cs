@@ -21,5 +21,14 @@ namespace AzEmidsFunction.Data {
             return (PatientItem)segment.Results?.FindLast(x => x.EmailId == rowKey);
         }
 
+        public async Task<PatientItem> CreateAPatientInformation(CloudTable table, String invocationName, Patient patient)
+        { 
+            var patientInformation = new Patient(patient);
+            var query = new PatientItem(patient);
+            var operation = TableOperation.InsertOrMerge(query);
+            var tableResult = await table.ExecuteAsync(operation);
+            return (PatientItem)tableResult.Result;
+        }
+
     }
 }
