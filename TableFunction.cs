@@ -52,20 +52,39 @@ namespace AzEmidsFunction
 
         [FunctionName("CreateOrUpdateAPatient")]
         public static async Task<object> CreateOrUpdateAPatient(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "patient/create")] HttpRequestMessage req
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "patient/upsert")] HttpRequestMessage req
             , ILogger log)
         {
             string jsonContent = await req.Content.ReadAsStringAsync();
             var patient = JsonConvert.DeserializeObject<Patient>(jsonContent);
             if (patient is null)
                 return new BadRequestResult();
-            log.LogInformation($"Patient {patient.Name} received with email {patient.EmailId} at UTC time {System.DateTime.UtcNow}");
+            log.LogInformation($"Patient {patient.Name} for upsert request received with email {patient.EmailId} at UTC time {System.DateTime.UtcNow}");
 
             CloudStorageAccount storageAccount = CloudStorageAccount.Parse(System.Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
             CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
             CloudTable table = tableClient.GetTableReference("PatientTestTable");
             ITableDBRepository<Patient> respository = new TableDBRepository<Patient>();
             var patientItems = await respository.CreateAPatientInformation(table, "Patient", patient);
+            return (object)new OkObjectResult(patient);
+        }
+
+        [FunctionName("DeleteAPatient")]
+        public static async Task<object> DeleteAPatient(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "patient/delete")] HttpRequestMessage req
+            , ILogger log)
+        {
+            string jsonContent = await req.Content.ReadAsStringAsync();
+            var patient = JsonConvert.DeserializeObject<Patient>(jsonContent);
+            if (patient is null)
+                return new BadRequestResult();
+            log.LogInformation($"Patient {patient.Name} for delete request received with email {patient.EmailId} at UTC time {System.DateTime.UtcNow}");
+
+            CloudStorageAccount storageAccount = CloudStorageAccount.Parse(System.Environment.GetEnvironmentVariable("AzureWebJobsStorage"));
+            CloudTableClient tableClient = storageAccount.CreateCloudTableClient();
+            CloudTable table = tableClient.GetTableReference("PatientTestTable");
+            ITableDBRepository<Patient> respository = new TableDBRepository<Patient>();
+            var patientItems = await respository.DeleteAPatientInformation(table, "Patient", patient);
             return (object)new OkObjectResult(patient);
         }
     }

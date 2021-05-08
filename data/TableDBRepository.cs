@@ -30,5 +30,16 @@ namespace AzEmidsFunction.Data {
             return (PatientItem)tableResult.Result;
         }
 
+        public async Task<PatientItem> DeleteAPatientInformation(CloudTable table, String invocationName, Patient patient)
+        { 
+            var patientInformation = new Patient(patient);
+            var query = new PatientItem(patient);
+            var operation = TableOperation.Retrieve<PatientItem>(query.PartitionKey, query.RowKey);
+            var readResult = table.ExecuteAsync(operation).GetAwaiter().GetResult().Result as PatientItem;
+            operation = TableOperation.Delete(readResult);
+            var deleteResult = await table.ExecuteAsync(operation);
+            return (PatientItem)deleteResult.Result;
+        }
+
     }
 }
