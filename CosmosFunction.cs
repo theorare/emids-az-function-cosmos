@@ -8,15 +8,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace AzEmidsFunction
 {
     public static class GetAll
     {
         [FunctionName("GetAll")]
-        public static async Task<IEnumerable<Patient>> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Get")]HttpRequest req, TraceWriter log)
+        public static async Task<IEnumerable<Patient>> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Get")]HttpRequest req, ILogger log)
         {
-            log.Info("C# HTTP trigger function to get all patient data from Cosmos DB");
+            log.LogInformation("C# HTTP trigger function to get all patient data from Cosmos DB");
 
             IDocumentDBRepository<Patient> Respository = new DocumentDBRepository<Patient>();
             return await Respository.GetItemsAsync("Patient");
@@ -26,9 +27,9 @@ namespace AzEmidsFunction
     public static class GetPatient
     {
         [FunctionName("GetPatient")]
-        public static async Task<Patient> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Get/{emailId}")]HttpRequest req, TraceWriter log, string id, string emailId)
+        public static async Task<Patient> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "Get/{emailId}")]HttpRequest req, ILogger log, string id, string emailId)
         {
-            log.Info("C# HTTP trigger function to get a single patient data from Cosmos DB");
+            log.LogInformation("C# HTTP trigger function to get a single patient data from Cosmos DB");
 
             IDocumentDBRepository<Patient> Respository = new DocumentDBRepository<Patient>();
             var patients = await Respository.GetItemsAsync(d => d.Id == id && d.EmailId == emailId, "Patient");
@@ -45,9 +46,9 @@ namespace AzEmidsFunction
     public static class CreateOrUpdate
     {
         [FunctionName("CreateOrUpdate")]
-        public static async Task<bool> Run([HttpTrigger(AuthorizationLevel.Function, "post", "put", Route = "CreateOrUpdate")]HttpRequest req, TraceWriter log)
+        public static async Task<bool> Run([HttpTrigger(AuthorizationLevel.Function, "post", "put", Route = "CreateOrUpdate")]HttpRequest req, ILogger log)
         {
-            log.Info("C# HTTP trigger function to create or update a patient record into Cosmos DB");
+            log.LogInformation("C# HTTP trigger function to create or update a patient record into Cosmos DB");
             try
             {
                 IDocumentDBRepository<Patient> Respository = new DocumentDBRepository<Patient>();
@@ -66,7 +67,7 @@ namespace AzEmidsFunction
             }
             catch
             {
-                log.Info("Error occured while creating a record into Cosmos DB");
+                log.LogError("Error occured while creating a record into Cosmos DB");
                 return false;
             }
 
@@ -76,9 +77,9 @@ namespace AzEmidsFunction
     public static class Delete
     {
         [FunctionName("Delete")]
-        public static async Task<bool> Run([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Delete/{id}/{cityName}")]HttpRequest req, TraceWriter log, string id, string cityName)
+        public static async Task<bool> Run([HttpTrigger(AuthorizationLevel.Function, "delete", Route = "Delete/{id}/{cityName}")]HttpRequest req, ILogger log, string id, string cityName)
         {
-            log.Info("C# HTTP trigger function to delete a record from Cosmos DB");
+            log.LogInformation("C# HTTP trigger function to delete a record from Cosmos DB");
 
             IDocumentDBRepository<Patient> Respository = new DocumentDBRepository<Patient>();
             try
