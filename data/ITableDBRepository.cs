@@ -4,7 +4,8 @@ using System;
 using System.Collections.Generic;
 
 namespace AzEmidsFunction.Data {
-    public interface ITableDBRepository<T> where T : class {
-        Task<List<PatientItem>> GetAllMessages(CloudTable table, String invocationName);
+    public interface ITableDBRepository<T> where T : class, new() {
+        Task<List<PatientItem>> GetAllPatientInformation(CloudTable table, String invocationName);
+        Task<PatientItem> GetAPatientInformation(CloudTable table, String invocationName, string rowKey);
     }
 }
